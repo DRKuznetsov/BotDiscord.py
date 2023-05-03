@@ -11,10 +11,12 @@ Eye Of KSYP Разбор Процесса
 - ``su_report`` - Идентификатор канала для отправки заполненных стендапов.
 - ``su_send`` - Идентификатор канала для отправки объявления о начале стендапа
 
-.. code:: py
+.. code:: python
+
     bi_rpa_guild = 1088107116042129548
     su_report = 1088350602150543380
     su_send = 1088447246560935986
+
 Классы
 ----
 
@@ -23,11 +25,14 @@ StandUpModal
 | Объявление класса ``StandUpModal()``.
 - ``Modal`` - всплывающее окно с настраиваемыми элементами.
 
-.. code:: py
+.. code:: python
+
     class StandUpModal(Modal, title="Стендап"):
+
 Создание текстовых полей.
 
-.. code:: py
+.. code:: python
+
     su_com = TextInput(
         # Тип текстового поля. short - однострочный, long - многострочный.
         style=discord.TextStyle.short,
@@ -40,22 +45,28 @@ StandUpModal
         # Является ли поле обязательным.
         required=True
     )
+
 | Объявление события происходящего при отправке заполненного ``Modal``.
 - ``interaction`` - переменная описывающая текущее взаимодействие с ``Modal``.
 
-.. code:: py
+.. code:: python
+
     async def on_submit(self, interaction: discord.Interaction):
+
 Описание действий при отправке ``Modal``.
 
-.. code:: py
+.. code:: python
+
     # Вывод в консоль сообщения о начале обработки Modal от конкретного пользователя.
     print("Обработка Стендапа От " + interaction.user.name)
     # Получение канала для отправки отчета.
     channel = client.get_channel(su_report)
+
 | Создание отчета в виде ``Embed``.
 - ``Embed`` - сообщение с настраиваемыми UI элементами.
 
-.. code:: py
+.. code:: python
+
     # Получение цвета пользователя.
     usercolor = await client.fetch_user(interaction.user.id)
     # Создание Embed.
@@ -68,17 +79,21 @@ StandUpModal
     embed.add_field(name="План на сегодня:", value=str(self.su_content), inline=False)
     # Отправка отчета в виде Embed.
     await channel.send(embed=embed)
+
 | Данная конструкция отправляет клиенту пользователя уведомлениие об обработке ``Modal``.
 | Если не прислать уведомление, пользователь увидит ошибку. Сам ``Modal`` будет обработан.
 
-.. code:: py
+.. code:: python
+
     try:
         await interaction.response.send_message()
     except:
         print("Стендап Обработан От " + interaction.user.name)
+
 | Присвоение роли и отправка отчета автору стендапа.
 
-.. code:: py
+.. code:: python
+
     # Получение сервера.
     myguild = client.get_guild(bi_rpa_guild)
     # Получение списка ролей сервера.
@@ -98,6 +113,7 @@ StandUpModal
     except:
         # В случае ошибки в консоль выведется сообщение.
         print("Can Not Assign Role")
+
 PersistentView
 ~~~~
 | View - способ представления UI элементов в Discord.
@@ -107,11 +123,14 @@ PersistentView
 
 | Объявление класса ``PersistentView()``.
 
-.. code:: py
+.. code:: python
+
     class PersistentView(discord.ui.View):
+
 Реализация класса.
 
-.. code:: py
+.. code:: python
+
     # Кнструктор.
     def __init__(self):
         # Отключение тайм-аута.
@@ -121,16 +140,20 @@ PersistentView
     async def blurple(self, interaction: discord.Interaction, button: discord.ui.Button):
         # Отправка Modal в случае взаимодествия с кнопкой.
         await interaction.response.send_modal(StandUpModal())
+
 PersistentViewBot
 ~~~~
 | Класс для создания самого экземпляра бота.
 | Объявление класса ``PersistentViewBot()``.
 
-.. code:: py
+.. code:: python
+
     class PersistentViewBot(commands.Bot):
+
 Реализация конструктора.
 
-.. code:: py
+.. code:: python
+
     def __init__(self):
         # Определяет объем полномочий бота.
         intents = discord.Intents.default()
@@ -141,14 +164,18 @@ PersistentViewBot
         # Инициализация бота с указанными полномочиями.
         # Указание префикса команд. Не используется, но возможно понадобится в будущем.
         super().__init__(command_prefix=commands.when_mentioned_or('$'), intents=intents)
+
 Непосредственное переподключение к ранее созданным ``View``.
 
-.. code:: py
+.. code:: python
+
     async def setup_hook(self) -> None:
         self.add_view(PersistentView())
+
 Данные блок выполняется при событии запуска бота.
 
-.. code:: py
+.. code:: python
+
     async def on_ready(self):
         # Запуск задач с расписанием.
         standup.start()
@@ -159,12 +186,14 @@ PersistentViewBot
         # Сообщение в консоль об успешной авторизации бота.
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')
+
 Задачи
 ----
 | Задачи - методы выполняющиеся по заданному расписанию.
 | Шаблон задачи с расписанием.
 
-.. code:: py
+.. code:: python
+
     # Объявление задачи. Выполняется раз в 24 часа.
     @tasks.loop(hours=24)
     async def method(): ...
@@ -173,12 +202,14 @@ PersistentViewBot
     # Когда данный метод закончит работу, начнется выполнение задачи.
     @method.before_loop
     async def before_method(): ...
+
 standup
 ~~~~
 | Данная задача начинает стендап в 9:00, каждый будний день.
 | Реализация расписания. Рассмотрим только это расписание. Остальные строятся точно по такому же принципу.
 
-.. code:: py
+.. code:: python
+
     # Цикл на колличество секунд в одном дне.
     for _ in range(60 * 60 * 24):
         # Условие при котором расписание должно закончить работу.
@@ -189,9 +220,11 @@ standup
             return
         # Ожидание, если условние не выполнилось.
         await asyncio.sleep(31)
+
 Реализация задачи.
 
-.. code:: py
+.. code:: python
+
     myguild = client.get_guild(bi_rpa_guild)
     allroles = myguild.roles
     try:
@@ -211,11 +244,13 @@ standup
     await channel.send(text, view=PersistentView())
     su_channel = client.get_channel(su_report)
     await su_channel.send(content='<@&1088108846775554128> Новый день - Новый стендап!')
+
 notify и notify_last
 ~~~~
 Задачи для отправки напоминания о скором закрытии стендапа. Имеют схожую реализацию, рассмотрим только ``notify``.
 
-.. code:: py
+.. code:: python
+
     try:
         myguild = client.get_guild(bi_rpa_guild)
         # Получение списка участников сервера.
@@ -236,11 +271,13 @@ notify и notify_last
                     await user.send("Не забываем заполнить стендап! Осталось всего 90 минут.")
     except:
         print('notify error')
+
 standup_end
 ~~~~
 Задача завершающая стендап.
 
-.. code:: py
+.. code:: python
+
     limit = 0
     my_channel = client.get_channel(su_send)
     # Получение количества сообщений в канале.
@@ -248,13 +285,15 @@ standup_end
         limit += 1
     # Удаление сообщений канала в количестве равном limit.
     await my_channel.purge(limit=limit)
+
 ksyp
 ~~~~
 | Данная задача отправлеяет отчет о несписанных часах в КСУП.
 | Рассмотрим только взаимодействие с ботом, поскольку работа с ``dataframe`` и Excel достаточно тривиальна.
 | Создание наполнения сообщений.
 
-.. code:: py
+.. code:: python
+
     # Получение списка пользователей.
     list_users = client.users
     # Сообщение с упоминаниями.
@@ -272,9 +311,11 @@ ksyp
         except:
             # Добавление пользователя в сообщение с без упоминания.
             non_tagline = non_tagline + re.findall("\w*", name)[2] + ' ' + re.findall("\w*", name)[0] + '; '
+
 Отправка созданных сообщений. Максимальная длина сообщения бота 2000 символов.
 
-.. code:: py
+.. code:: python
+
     # Отправка заголовочного сообщения.
     await channel.send(content='Око КСУП следит за вами')
     # Отправка первых 2000 символов отчета.
