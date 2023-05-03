@@ -38,8 +38,8 @@ Eye Of KSYP
 #. Создать Application с ботом внутри.
 #. Получить токен бота.
 #. Выдать боту права на ``PRESENCE INTENT``, ``SERVER MEMBERS INTENT``, ``MESSAGE CONTENT INTENT``.
-#. Пригласить бота на нужный сервер. Для этого можно использовать вкладку OAuth2 |rarr| URL Generator.
-#. Ставим галочки Scopes |rarr| bot и Bot Permissions |rarr| Administrator.
+#. Пригласить бота на нужный сервер. Для этого можно использовать вкладку OAuth2 → URL Generator.
+#. Ставим галочки Scopes → bot и Bot Permissions → Administrator.
 #. Переходим по созданной ссылке и добавляем бота на сервер.
 
 Полученный токен необходимо указать в скрипте, в последней строке.
